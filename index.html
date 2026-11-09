@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="The Forge">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121213" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+<title>The Forge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&family=Zilla+Slab:wght@600;700&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="styles.css?v=2b25c8a6ee">
+</head>
+<body>
+<div id="app">
+
+  <!-- SIGN IN: household PIN, then who's training -->
+  <section class="view" id="v-who" hidden>
+    <div class="who-body">
+      <div class="who-mark">The <span>Forge</span></div>
+      <div id="who-pin" hidden>
+        <p class="muted center">Enter the household PIN</p>
+        <input id="pin-in" class="pin" type="password" inputmode="numeric" autocomplete="off">
+        <button class="btn big" id="pin-go">Unlock</button>
+        <p class="err center" id="pin-err" hidden></p>
+      </div>
+      <div id="who-pick" hidden>
+        <p class="muted center">Who's training?</p>
+        <div class="who-list" id="who-list"></div>
+        <button class="btn ghost" data-act="new-profile">+ Add a lifter</button>
+      </div>
+      <p class="muted center small" id="who-status"></p>
+    </div>
+  </section>
+
+  <!-- HOME -->
+  <section class="view tabbed" id="v-home" hidden>
+    <header class="bar home-bar">
+      <div class="wordmark">The <span>Forge</span></div>
+      <button class="me-chip" id="me-chip"></button>
+    </header>
+    <div class="body" id="home-body"></div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="view tabbed" id="v-plan" hidden>
+    <header class="bar"><span></span><h1>Plan</h1><div class="bar-r"><button class="icon" data-act="regen" aria-label="Rebuild plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button></div></header>
+    <div class="body" id="plan-body"></div>
+  </section>
+
+  <!-- COACH -->
+  <section class="view tabbed" id="v-coach" hidden>
+    <header class="bar"><span></span><h1>Coach</h1><span></span></header>
+    <div class="body chat" id="coach-body"></div>
+    <form class="ask" id="coach-form">
+      <input id="coach-in" placeholder="Ask Coach anything…" autocomplete="off">
+      <button class="btn" id="coach-send">Ask</button>
+    </form>
+  </section>
+
+  <!-- PROGRESS -->
+  <section class="view tabbed" id="v-progress" hidden>
+    <header class="bar"><span></span><h1>Progress</h1><span></span></header>
+    <div class="body" id="progress-body"></div>
+  </section>
+
+  <!-- PROFILE -->
+  <section class="view tabbed" id="v-profile" hidden>
+    <header class="bar"><button class="icon" data-act="back-home" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h1 id="profile-title">Profile</h1><span></span></header>
+    <div class="body" id="profile-body"></div>
+  </section>
+
+  <!-- WORKOUT (full screen, no tab bar) -->
+  <section class="view" id="v-workout" hidden>
+    <header class="bar wbar">
+      <button class="icon" data-act="leave-workout" aria-label="Leave"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div class="wtitle"><b id="w-title"></b><small id="w-sub"></small></div>
+      <div class="bar-r"><button class="btn sm coachbtn" data-act="coach-adjust">🧢 Coach</button><button class="btn sm" id="w-finish" data-act="finish">Finish</button></div>
+    </header>
+    <div class="chips" id="w-chips"></div>
+    <div class="body" id="w-body"></div>
+    <div class="rest" id="rest" hidden>
+      <div class="rest-t"><b id="rest-n">0:00</b><div class="rest-bar"><i id="rest-fill"></i></div></div>
+      <button class="btn sm ghost" data-act="rest-add">+15s</button>
+      <button class="btn sm" data-act="rest-skip" id="rest-skip">Skip</button>
+    </div>
+  </section>
+
+  <nav class="tabs" id="tabs" hidden>
+    <button data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+    <button data-tab="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>Plan</button>
+    <button data-tab="coach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg>Coach</button>
+    <button data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Progress</button>
+    <button data-tab="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Me</button>
+  </nav>
+
+  <div class="modal" id="modal" hidden><div class="sheet"><button class="icon close" id="modal-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div id="modal-body"></div></div></div>
+  <div class="toast" id="toast" hidden></div>
+</div>
+
+<script src="config.js?v=717eebe905"></script>
+<script src="js/data.js?v=a86059aecc"></script>
+<script src="js/engine.js?v=f38496c7d9"></script>
+<script src="js/core.js?v=4c90d27c36"></script>
+<script src="js/views.js?v=effb1eb39d"></script>
+<script src="js/workout.js?v=d29dfa324e"></script>
+<script src="js/coach.js?v=8d247c2c86"></script>
+<script src="js/boot.js?v=1eb5d91988"></script>
+</body>
+</html>
