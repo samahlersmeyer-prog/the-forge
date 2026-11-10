@@ -40,5 +40,6 @@ Pushing to `main` deploys. Built like Big Dawg Daily (`samahlersmeyer-prog/bigda
 - Sheet tabs: Profiles, Plans (days/schedule/rules as JSON), Sessions, Sets, Metrics, Progress, Recaps, Coach, Config.
 
 ## To-do
-- Sam to finish setup (README steps 1–4), then put the `/exec` URL in `config.js`.
+- Sheet connected (Nov 2026): "The Forge — Data" in Sam's Drive, Apps Script project "The Forge Server", web app deployed
+  (Execute as Me, Anyone), URL in `config.js`. PIN lives in the Config tab. Coach is in free mode until an API key is added (README step 5).
 - Ideas: more for Max (Max Effort challenges), coach-written weekly plan tweaks, charts on the Progress tab.
