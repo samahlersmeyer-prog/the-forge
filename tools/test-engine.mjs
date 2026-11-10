@@ -3,12 +3,14 @@
 // • the rotation reaches all four lifts • teens never get adult-only lifts • progression rules behave
 import fs from "fs"; import vm from "vm";
 const ctx = {}; vm.createContext(ctx);
-vm.runInContext(["js/data.js", "js/engine.js"].map(f => fs.readFileSync(new URL("../" + f, import.meta.url), "utf8")).join("\n") + "\n;globalThis.__x={EX,generatePlan,nextDay,suggest,scoreWorkout};", ctx);
-const { EX, generatePlan, nextDay, suggest, scoreWorkout } = ctx.__x;
+vm.runInContext(["js/data.js", "js/howto.js", "js/engine.js"].map(f => fs.readFileSync(new URL("../" + f, import.meta.url), "utf8")).join("\n") + "\n;globalThis.__x={HOW,EX,generatePlan,nextDay,suggest,scoreWorkout};", ctx);
+const { HOW, EX, generatePlan, nextDay, suggest, scoreWorkout } = ctx.__x;
 let bad = 0; const ok = (c, m) => { if (!c) { bad++; console.log("✗ " + m); } };
 const pattern = id => EX[id] && EX[id].core_lift && ["back_squat","deadlift","bench_press","power_clean","goblet_squat","trap_bar_deadlift","db_bench_press","hang_clean_pull","hang_power_clean"].includes(id) ? EX[id].core_lift : null;
 const blank = { squat: {}, bench: {}, clean: {}, deadlift: {} };
 let n = 0;
+for (const id in EX) ok(HOW[id] && HOW[id].what && HOW[id].setup && HOW[id].steps.length >= 3 && HOW[id].demo, "no How-to-do-it for " + id);
+for (const id in HOW) ok(EX[id], "How-to-do-it for unknown exercise " + id);
 for (const type of ["adult", "teen"]) for (const d of [2, 3, 4, 5]) for (const goal of ["strength", "sports", "balanced"]) for (const len of [45, 60, 90]) for (const experience of ["beginner", "intermediate"]) {
   n++;
   const p = { id: "p", name: "X", type, age: type === "teen" ? 13 : 40, bodyweight: type === "teen" ? 115 : 200, experience, goal, days_per_week: d, session_length: len, form_focus_mode: type === "teen", lifts: blank };

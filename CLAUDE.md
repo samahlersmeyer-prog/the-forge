@@ -25,6 +25,7 @@ Pushing to `main` deploys. Built like Big Dawg Daily (`samahlersmeyer-prog/bigda
 - `index.html` markup only. `styles.css` all styles (light/dark by system; adult = forge orange, teen = blue via `body.teen-on`).
 - `config.js` — Apps Script `/exec` URL (blank = phone-only mode).
 - `js/data.js` — exercise library `EXERCISES` / `EX` (form cues split by " | ").
+- `js/howto.js` — `HOW[id]`: plain-English what/setup/steps + YouTube demo search for every exercise; `howBlock()` shows it on Plan and in the runner (open the first time a lifter does it). Every new exercise needs a HOW entry — the engine check fails without one.
 - `js/engine.js` — pure logic: `generatePlan`, `nextDay`, `suggest` (double progression), `scoreWorkout` (PRs, XP, streak + monthly freeze, badges).
 - `js/core.js` — local DB mirror of the Sheet, outbox (`af:out`) + `sync()`/`flush()`, `api()`, toast/modal/confetti/chime, `show(view)`, `ACTIONS` click delegation (`data-act`).
 - `js/views.js` — Home, Plan, Progress (sparklines), Profile/specs form, lifter switcher.

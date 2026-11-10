@@ -1,7 +1,7 @@
 // AthleteForge service worker: opens instantly from the phone, updates quietly in the background.
 // tools/stamp.py rewrites V and SHELL; never hand-edit them.
-const V = "af-e021f89772";
-const SHELL = ["./", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./styles.css?v=2b25c8a6ee", "./config.js?v=717eebe905", "./js/data.js?v=a86059aecc", "./js/engine.js?v=f38496c7d9", "./js/core.js?v=4c90d27c36", "./js/views.js?v=effb1eb39d", "./js/workout.js?v=d29dfa324e", "./js/coach.js?v=8d247c2c86", "./js/boot.js?v=1eb5d91988"];
+const V = "af-cfcb7ead90";
+const SHELL = ["./", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./styles.css?v=ab31318cf4", "./config.js?v=717eebe905", "./js/data.js?v=a86059aecc", "./js/howto.js?v=7ef689141b", "./js/engine.js?v=f38496c7d9", "./js/core.js?v=4c90d27c36", "./js/views.js?v=1a6216fb85", "./js/workout.js?v=d464a79eb8", "./js/coach.js?v=8d247c2c86", "./js/boot.js?v=1eb5d91988"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: "reload" })))).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V && !k.endsWith("-fonts")).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", e => {

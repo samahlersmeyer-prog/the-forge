@@ -229,3 +229,15 @@ textarea { width: 100%; min-height: 70px; border-radius: 12px; border: 1.5px sol
 .confetti span { font-size: 30px; }
 @keyframes fall { to { transform: translate(var(--dx), 110vh) rotate(var(--r)); } }
 .pop { animation: pop .45s cubic-bezier(.2,1.6,.4,1); } @keyframes pop { from { transform: scale(.6); opacity: 0; } }
+/* How to do it (js/howto.js) */
+details.how { margin-top: 2px; }
+details.how .how-what, details.how .how-setup, details.how .how-gear, details.how ol { margin: 4px 0 0 22px; font-size: 13px; color: var(--muted); }
+details.how ol { padding-left: 18px; }
+.how-what { font-weight: 600; color: var(--ink) !important; }
+.how-box { margin-bottom: 8px; }
+.how-box p { margin: 6px 0 0; font-size: 14px; } .how-box .how-what { font-size: 15px; }
+.how-box ol { margin: 6px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 5px; font-size: 14px; }
+.how-demo { display: inline-block; margin: 8px 0 2px 22px; font-size: 13px; font-weight: 700; color: var(--forge); text-decoration: none; }
+.how-box .how-demo { margin-left: 0; font-size: 14px; }
+.teen-on .how-demo { color: var(--teen); }
+.how-box ol li::before { content: none; }

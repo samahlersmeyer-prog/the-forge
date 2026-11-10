@@ -60,6 +60,7 @@ function renderWorkout() {
     <div class="w-dose">${doseText(it)}${it.rest_sec ? `<small>rest ${fmtRest(it.rest_sec)}</small>` : ""}</div>
     ${it.notes ? `<p class="muted small" style="margin:6px 0 0">${esc(it.notes)}</p>` : ""}</div>`;
   if (it.coached) h += `<div class="coachnote">🧢 ${esc(it.coached)}</div>`;
+  h += howBlock(ex, !prevSess && !W.done[W.idx], "cues-box how-box"); // open the first time they do it
   h += `<details class="cues-box" ${c.p.form_focus_mode || c.simple ? "open" : ""}><summary>Form cues</summary><ul>${(ex.form_cues || "").split("|").map(x => `<li>${esc(x.trim())}</li>`).join("")}</ul></details>`;
 
   if (c.simple) {

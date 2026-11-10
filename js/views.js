@@ -114,6 +114,7 @@ function renderPlan() {
       d.items.map(i => { const ex = EX[i.exercise_id];
         return `<div class="ex"><div class="ex-top"><span><span class="n">${i.order}.</span>${esc(ex.name)}</span><span class="dose">${doseText(i)}</span></div>
         <div class="ex-meta">${BLOCK[i.block]}${i.load_lb ? ` · start <b>${loadText(i.load_lb, ex)}</b>` : ""}${i.rest_sec ? " · rest " + fmtRest(i.rest_sec) : ""}${i.notes ? "<br>" + esc(i.notes) : ""}</div>
+        ${howBlock(ex, false, "cues how")}
         <details class="cues"><summary>Form cues</summary><ul>${cuesList(ex)}</ul></details></div>`; }).join("") + `</div></div>`;
   });
   $("plan-body").innerHTML = h;
