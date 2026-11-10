@@ -172,48 +172,74 @@ function renderProfile(arg = {}) {
     const p = arg.fresh ? null : profile();
     if (p) FORM = JSON.parse(JSON.stringify(p));
     else {
-      const t = profiles().some(x => x.type === "adult") ? "teen" : "adult";
-      FORM = { fresh: true, id: uid("p_"), name: "", type: t, age: "", bodyweight: "", experience: "beginner",
+      const t = arg.teen || profiles().some(x => x.type === "adult") ? "teen" : "adult";
+      FORM = { fresh: true, step: 0, id: uid("p_"), name: "", type: t, age: "", bodyweight: "", experience: "beginner",
         lifts: { squat: {}, bench: {}, clean: {}, deadlift: {} }, days_per_week: t === "teen" ? 3 : 4, session_length: 60,
         goal: t === "teen" ? "sports" : "balanced", form_focus_mode: t === "teen", avatar: t === "teen" ? "⚡" : "🏋️" };
     }
   }
-  $("profile-title").textContent = FORM.fresh ? "New lifter" : coaching() ? FORM.name + "'s specs" : "My specs";
-  const f = FORM, teen = f.type === "teen";
+  const f = FORM, teen = f.type === "teen", first = f.fresh && !profiles().length;
+  $("profile-title").textContent = f.fresh ? (first ? "Welcome" : teen ? "Add an athlete" : "New lifter") : coaching() ? f.name + "'s specs" : "My specs";
   const seg = (key, opts) => `<div class="seg" style="grid-template-columns:repeat(${opts.length},1fr)">${opts.map(([v, l]) => `<button data-act="seg" data-k="${key}" data-v="${v}" class="${String(f[key]) === String(v) ? "on" : ""}">${l}</button>`).join("")}</div>`;
-  const prog = progressOf(f.id);
-  $("profile-body").innerHTML = `
-  <div class="card"><h3>Who</h3>
+  const who = `<div class="card"><h3>Who</h3>
     ${seg("type", [["adult", "Adult"], ["teen", "Teen / Athlete"]])}
-    <div class="field" style="margin-top:10px"><label>Name</label><input id="f-name" value="${esc(f.name)}" autocomplete="off"></div>
-    <div class="avs" style="margin-top:10px">${AVATARS.map(a => `<button data-act="avatar" data-v="${a}" class="${a === f.avatar ? "on" : ""}">${a}</button>`).join("")}</div>
-    <div class="grid2" style="margin-top:10px"><div class="field"><label>Age</label><input id="f-age" type="number" inputmode="numeric" value="${esc(f.age)}"></div>
+    <div class="field"><label>Name</label><input id="f-name" value="${esc(f.name)}" autocomplete="off" placeholder="${teen ? "Max" : "Sam"}"></div>
+    <div class="grid2"><div class="field"><label>Age</label><input id="f-age" type="number" inputmode="numeric" value="${esc(f.age)}"></div>
     <div class="field"><label>Bodyweight (lb)</label><input id="f-bw" type="number" inputmode="decimal" value="${esc(f.bodyweight)}"></div></div>
-    <div class="field" style="margin-top:10px"><label>Lifting experience</label>${seg("experience", [["beginner", "Beginner"], ["intermediate", "Intermediate"]])}</div>
-    ${teen ? `<p class="muted small" style="margin:6px 0 0">Beginner uses technique versions (goblet squat, DB bench, hang clean pulls, trap-bar). Switch to Intermediate once the barbell lifts look smooth.</p>` : ""}
-  </div>
-  <div class="card"><h3>${teen ? "Best recent sets (optional)" : "Best recent sets"}</h3>
-    <p class="muted small" style="margin:0 0 8px">${teen ? "Only if he's done the barbell lift lately with good form. Blank = safe starting weights." : "A recent hard set, like 225 × 5. Blank = bodyweight-based starting weights."}</p>
-    ${CORE_LIFTS.map(l => `<div class="liftrow" style="margin-top:6px"><b>${LIFT_NAME[l]}</b><input id="f-${l}-w" type="number" inputmode="decimal" placeholder="lb" value="${esc((f.lifts[l] || {}).weight || "")}"><span class="muted">×</span><input id="f-${l}-r" type="number" inputmode="numeric" placeholder="reps" value="${esc((f.lifts[l] || {}).reps || "")}"></div>`).join("")}
-  </div>
-  <div class="card"><h3>Schedule & goal</h3>
+    <div class="field"><label>Lifting experience</label>${seg("experience", [["beginner", "Beginner"], ["intermediate", "Intermediate"]])}</div>
+    ${teen ? `<p class="muted small" style="margin:0">Beginner uses technique versions (goblet squat, DB bench, hang clean pulls, trap-bar). Switch to Intermediate once the barbell lifts look smooth.</p>` : ""}
+    <div class="field"><label>Icon</label><div class="avs">${AVATARS.map(a => `<button data-act="avatar" data-v="${a}" class="${a === f.avatar ? "on" : ""}">${a}</button>`).join("")}</div></div>
+  </div>`;
+  const lifts = `<div class="card"><h3>${teen ? "Best recent sets (optional)" : "Best recent sets"}</h3>
+    <p class="muted small" style="margin:0">${teen ? "Only if he's done the barbell lift lately with good form. Leave blank for safe starting weights." : "A recent hard set, like 225 × 5. Leave blank for bodyweight-based starting weights."}</p>
+    ${CORE_LIFTS.map(l => `<div class="liftrow"><b>${LIFT_NAME[l]}</b><input id="f-${l}-w" type="number" inputmode="decimal" placeholder="lb" value="${esc((f.lifts[l] || {}).weight || "")}"><span class="muted">×</span><input id="f-${l}-r" type="number" inputmode="numeric" placeholder="reps" value="${esc((f.lifts[l] || {}).reps || "")}"></div>`).join("")}
+  </div>`;
+  const sched = `<div class="card"><h3>Schedule & goal</h3>
     <div class="field"><label>Days per week</label>${seg("days_per_week", [[2, "2"], [3, "3"], [4, "4"], [5, "5"]])}</div>
-    <div class="field" style="margin-top:10px"><label>Session length</label>${seg("session_length", [[45, "45m"], [60, "60m"], [75, "75m"], [90, "90m"]])}</div>
-    <div class="field" style="margin-top:10px"><label>Primary goal</label>${seg("goal", [["strength", "Strength"], ["sports", "Sports"], ["balanced", "Balanced"]])}</div>
-    <button class="toggle${f.form_focus_mode ? " on" : ""}" data-act="ff" style="margin-top:12px;width:100%"><span><b>Form-focus mode</b><br><span class="muted small">Rate form on every lift; cues open by default</span></span><i></i></button>
-  </div>
+    <div class="field"><label>Session length</label>${seg("session_length", [[45, "45m"], [60, "60m"], [75, "75m"], [90, "90m"]])}</div>
+    <div class="field"><label>Primary goal</label>${seg("goal", [["strength", "Strength"], ["sports", "Sports"], ["balanced", "Balanced"]])}</div>
+    <button class="toggle${f.form_focus_mode ? " on" : ""}" data-act="ff"><span><b>Form-focus mode</b><br><span class="muted small">Rate form on every lift; cues open by default</span></span><i></i></button>
+  </div>`;
+  const tb = teen ? " teen" : "";
+  if (f.fresh) {
+    // New lifter: three short steps instead of one long scroll.
+    const steps = [["About " + (f.name || (teen ? "him" : "you")), who], ["Starting numbers", lifts], ["Schedule", sched]], st = f.step || 0;
+    $("profile-body").innerHTML = `
+      ${first && st === 0 ? `<p class="muted" style="margin:0">Start with you — you'll add Max right after.</p>` : ""}
+      <div class="dots${tb}">${steps.map((x, i) => `<i class="${i <= st ? "on" : ""}"></i>`).join("")}<span class="muted small">Step ${st + 1} of 3 · ${esc(steps[st][0])}</span></div>
+      ${steps[st][1]}
+      <p class="err" id="f-err" hidden></p>
+      <div class="row nav2">${st ? `<button class="btn big ghost" data-act="f-back">Back</button>` : ""}
+      ${st < 2 ? `<button class="btn big${tb}" data-act="f-next">Next</button>` : `<button class="btn big${tb}" data-act="save-profile">Build ${teen ? "his" : "my"} plan</button>`}</div>`;
+    return;
+  }
+  const prog = progressOf(f.id);
+  $("profile-body").innerHTML = `${who}${lifts}${sched}
   <p class="err" id="f-err" hidden></p>
-  <button class="btn big${teen ? " teen" : ""}" data-act="save-profile">${f.fresh ? "Create & build my plan" : "Save & rebuild plan"}</button>
-  ${f.fresh ? "" : `<button class="btn ghost" data-act="save-profile" data-keep="1">Save without changing the plan</button>`}
-  ${f.fresh ? "" : `<div class="card"><h3>Lifetime</h3><div class="small">Level ${prog.level} · ${prog.xp} XP · longest streak ${prog.longest || 0} · ${sessionsOf(f.id).length} workouts</div></div>
+  <button class="btn big${tb}" data-act="save-profile">Save & rebuild plan</button>
+  <button class="btn ghost" data-act="save-profile" data-keep="1">Save without changing the plan</button>
+  <div class="card"><h3>Lifetime</h3><div class="small">Level ${prog.level} · ${prog.xp} XP · longest streak ${prog.longest || 0} · ${sessionsOf(f.id).length} workouts</div></div>
   <div class="card"><h3>This phone</h3><div class="small">${SERVER ? (pin() ? "Connected to the Google Sheet." : "Not signed in.") : "Not connected to a Google Sheet — data stays on this phone."}${store.get("af:out", []).length ? " Some changes are waiting to sync." : ""}</div>
-    <div class="pills" style="margin-top:8px"><button class="btn sm ghost" data-act="switch">Switch lifter</button>${SERVER ? `<button class="btn sm ghost" data-act="sync-now">Sync now</button>` : ""}</div></div>`}`;
+    <div class="pills" style="margin-top:8px"><button class="btn sm ghost" data-act="switch">Switch lifter</button><button class="btn sm ghost" data-act="new-profile">+ Add a lifter</button>${SERVER ? `<button class="btn sm ghost" data-act="sync-now">Sync now</button>` : ""}</div></div>`;
 }
 function readForm() {
-  const v = id => $(id).value.trim();
-  FORM.name = v("f-name"); FORM.age = +v("f-age") || ""; FORM.bodyweight = +v("f-bw") || "";
-  CORE_LIFTS.forEach(l => { const w = +v(`f-${l}-w`) || 0; FORM.lifts[l] = { weight: w, reps: +v(`f-${l}-r`) || (w ? 5 : 0) }; });
+  const v = id => ($(id) ? $(id).value.trim() : null);
+  if (v("f-name") !== null) { FORM.name = v("f-name"); FORM.age = +v("f-age") || ""; FORM.bodyweight = +v("f-bw") || ""; }
+  CORE_LIFTS.forEach(l => { if (v(`f-${l}-w`) === null) return; const w = +v(`f-${l}-w`) || 0; FORM.lifts[l] = { weight: w, reps: +v(`f-${l}-r`) || (w ? 5 : 0) }; });
 }
+function formError() {
+  if (!FORM.name) return "Name is required.";
+  if (!(FORM.age >= 8 && FORM.age <= 90)) return "Enter a valid age.";
+  if (!(FORM.bodyweight >= 50)) return "Enter bodyweight in pounds.";
+  return "";
+}
+ACTIONS["f-next"] = () => {
+  readForm();
+  const e = FORM.step === 0 && formError();
+  if (e) { $("f-err").textContent = e; $("f-err").hidden = false; return; }
+  FORM.step = (FORM.step || 0) + 1; renderProfile({ keep: true }); $("profile-body").scrollTop = 0;
+};
+ACTIONS["f-back"] = () => { readForm(); FORM.step = Math.max(0, (FORM.step || 0) - 1); renderProfile({ keep: true }); };
 ACTIONS.seg = el => {
   readForm(); FORM[el.dataset.k] = isNaN(+el.dataset.v) ? el.dataset.v : +el.dataset.v;
   if (el.dataset.k === "type" && FORM.fresh) { const t = FORM.type === "teen"; FORM.form_focus_mode = t; FORM.goal = t ? "sports" : "balanced"; FORM.avatar = t ? "⚡" : "🏋️"; }
@@ -225,16 +251,19 @@ ACTIONS.switch = () => pickLifter();
 ACTIONS["sync-now"] = () => sync().then(() => { toast("Synced ✓"); refresh(); }).catch(e => toast(errText(e)));
 ACTIONS["save-profile"] = el => {
   readForm();
-  const err = m => { $("f-err").textContent = m; $("f-err").hidden = false; };
-  if (!FORM.name) return err("Name is required.");
-  if (!(FORM.age >= 8 && FORM.age <= 90)) return err("Enter a valid age.");
-  if (!(FORM.bodyweight >= 50)) return err("Enter bodyweight in pounds.");
-  const p = Object.assign({}, FORM); delete p.fresh;
+  const e = formError();
+  if (e) { if (FORM.fresh) { FORM.step = 0; renderProfile({ keep: true }); } $("f-err").textContent = e; $("f-err").hidden = false; return; }
+  const p = Object.assign({}, FORM); delete p.fresh; delete p.step;
   put("Profiles", p);
-  const wasFresh = FORM.fresh;
+  const wasFresh = FORM.fresh, me = DB.Profiles[ME];
   if (!el.dataset.keep || wasFresh) savePlan(p);
-  if (wasFresh || !coaching()) { ME = p.id; store.set("af:me", ME); coachAs(null); }
   FORM = null;
+  if (wasFresh && me && me.id !== p.id && isTeen(p) && !isTeen(me)) {
+    // Dad added Max: stay signed in as Dad and open Max's new plan in coaching mode.
+    coachAs(p.id); toast(`${p.name}'s plan is built 💪`); return show("plan");
+  }
+  if (wasFresh || !coaching()) { ME = p.id; store.set("af:me", ME); coachAs(null); }
+  if (wasFresh && !isTeen(p) && !profiles().some(isTeen)) { toast("Plan built 💪 Now add Max"); return show("profile", { fresh: true, teen: true }); }
   toast(wasFresh ? "Plan built 💪" : "Saved");
   show(el.dataset.keep ? "home" : "plan");
 };

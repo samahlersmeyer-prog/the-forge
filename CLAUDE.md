@@ -8,7 +8,8 @@ Pushing to `main` deploys. Built like Big Dawg Daily (`samahlersmeyer-prog/bigda
 - After any change: `python3 tools/stamp.py`, then commit and push. It runs the engine checks (`node tools/test-engine.mjs`)
   and refuses to stamp if they fail, then bumps `?v=` and the `sw.js` cache so phones update. Never hand-edit `?v=` or `V`/`SHELL` in `sw.js`.
 - Try changes with `node tools/dev-server.mjs` (runs the real `server/Code.gs` against an in-memory Sheet; PIN 1234;
-  `NO_COACH=1` tests the free Coach mode). Check on a 390px-wide screen.
+  `NO_COACH=1` tests the free Coach mode). Check on a 390px-wide screen — inputs need `min-width:0`/16px font or iPhones zoom and scroll sideways.
+  `stamp.py` also runs `node --check` on every js file.
 - Commit messages: short, plain, feature-first.
 - Keep this file current and about a page.
 
@@ -28,7 +29,8 @@ Pushing to `main` deploys. Built like Big Dawg Daily (`samahlersmeyer-prog/bigda
 - `js/howto.js` — `HOW[id]`: plain-English what/setup/steps + YouTube demo search for every exercise; `howBlock()` shows it on Plan and in the runner (open the first time a lifter does it). Every new exercise needs a HOW entry — the engine check fails without one.
 - `js/engine.js` — pure logic: `generatePlan`, `nextDay`, `suggest` (double progression), `scoreWorkout` (PRs, XP, streak + monthly freeze, badges).
 - `js/core.js` — local DB mirror of the Sheet, outbox (`af:out`) + `sync()`/`flush()`, `api()`, toast/modal/confetti/chime, `show(view)`, `ACTIONS` click delegation (`data-act`).
-- `js/views.js` — Home, Plan, Progress (sparklines), Profile/specs form, lifter switcher. Tapping someone in Home's Family card
+- `js/views.js` — Home, Plan, Progress (sparklines), Profile/specs form (new lifter = 3 steps; first run does Sam, then
+  "Now add Max", and Max's plan opens in coaching mode), lifter switcher. Tapping someone in Home's Family card
   = coaching them (`AS`/`coachAs()` in core.js): `profile()` follows them, a banner shows "Coaching Max · Back to Sam", lasts 6 h.
 - `js/workout.js` — in-gym runner; state saved per workout in `af:w:*`; finish → Sets/Metrics/Sessions/Progress rows.
   "Workout day" picker on finish (today or up to 7 days back) for typing in numbers after the fact.

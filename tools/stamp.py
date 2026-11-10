@@ -6,6 +6,8 @@
 """
 import hashlib, pathlib, re, shutil, subprocess, sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+if shutil.which("node") and any(subprocess.run(["node", "--check", str(f)]).returncode for f in sorted((ROOT / "js").glob("*.js"))):
+    sys.exit("stamp: fix the syntax error above first")
 if shutil.which("node") and subprocess.run(["node", "tools/test-engine.mjs"], cwd=ROOT).returncode:
     sys.exit("stamp: fix the plan engine problems above first")
 h = lambda b: hashlib.sha1(b).hexdigest()[:10]
