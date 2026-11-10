@@ -1,6 +1,7 @@
 {
  "name": "The Forge",
  "short_name": "The Forge",
+ "description": "As iron sharpens iron, so one person sharpens another. — Proverbs 27:17",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",

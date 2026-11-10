@@ -23,6 +23,7 @@ Pushing to `main` deploys. Built like Big Dawg Daily (`samahlersmeyer-prog/bigda
   16-lifting-set soft cap, never two lower-body lifting days in a row, parent notes on teen sessions.
 
 ## Layout
+- Tagline: “As iron sharpens iron, so one person sharpens another.” (Proverbs 27:17) — `TAGLINE` in views.js; shown on sign-in, top of Home, workout summary.
 - `index.html` markup only. `styles.css` all styles (light/dark by system; adult = forge orange, teen = blue via `body.teen-on`).
 - `config.js` — Apps Script `/exec` URL (blank = phone-only mode).
 - `js/data.js` — exercise library `EXERCISES` / `EX` (form cues split by " | ").

@@ -197,7 +197,8 @@ function showSummary(p, session, res, sets, w) {
     ${res.prs.length ? `<div class="card" style="background:var(--good-soft)"><h3>New personal bests</h3>${res.prs.map(x => `<div>🏆 ${esc(x)}</div>`).join("")}</div>` : ""}
     ${res.badges.length ? `<div class="card"><h3>Badges unlocked</h3>${res.badges.map(b => `<div>${BADGE[b].emoji} <b>${esc(BADGE[b].name)}</b> — ${esc(BADGE[b].desc)}</div>`).join("")}</div>` : ""}
     <div class="card coach-card"><h3>🧢 Coach's write-up</h3>${coachOn() ? `<p class="recap" id="recap-text" style="margin:0">Writing it up…</p>` : `<p class="muted small" style="margin:0 0 8px">Claude writes it with today's numbers filled in.</p><button class="btn sm${teen ? " teen" : ""}" data-act="recap-claude">Get the write-up in Claude</button>`}</div>
-    <button class="btn big${teen ? " teen" : ""}" data-act="summary-done">Back home</button></div>`;
+    <button class="btn big${teen ? " teen" : ""}" data-act="summary-done">Back home</button>
+    <p class="tagline sm">“${TAGLINE}” <small>Proverbs 27:17</small></p></div>`;
   chime("win"); confetti(res.prs.length || res.leveled ? 120 : 70);
   sessionRecap(p, session, res, sets, w);
 }

@@ -1,5 +1,6 @@
 // views.js: Home, Plan, Progress, Profile (specs form) and the lifter switcher.
 
+const TAGLINE = "As iron sharpens iron, so one person sharpens another.";
 const WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const BLOCK = { warmup: "Warm-up", power: "Power", speed: "Speed", strength: "Strength", accessory: "Accessory", mobility: "Cool-down" };
 
@@ -24,7 +25,7 @@ function renderHome() {
   const lvlEnd = xpForLevel(prog.level + 1), lvlStart = xpForLevel(prog.level);
   const pct = Math.min(100, Math.round(100 * (prog.xp - lvlStart) / Math.max(1, lvlEnd - lvlStart)));
   const freeze = prog.freeze_month !== today.slice(0, 7);
-  let h = `
+  let h = `<p class="tagline sm">“${TAGLINE}” <small>Proverbs 27:17</small></p>
   <div class="card lvl">
     <div class="lvl-badge"><small>LEVEL</small><b>${prog.level}</b></div>
     <div><div class="row between"><b>${esc(p.name)}</b><span class="muted small">${prog.xp} / ${lvlEnd} XP</span></div>
