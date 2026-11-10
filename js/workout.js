@@ -96,12 +96,20 @@ function renderWorkout() {
   if (allDone || teen) {
     h += `<div class="${allDone ? "finish-box" : "card"}">${allDone ? `<b style="font-size:18px">All done 💪</b>` : ""}
       ${teen ? `<div class="field"><label>👨 Parent notes</label><textarea id="w-parent" placeholder="Form, how he looked, anything to watch next time…">${esc(W.parent)}</textarea></div>` : ""}
-      ${allDone ? `<div class="field"><label>Session notes</label><textarea id="w-notes" placeholder="How did it feel?">${esc(W.notes)}</textarea></div>
+      ${allDone ? `${dateField()}<div class="field"><label>Session notes</label><textarea id="w-notes" placeholder="How did it feel?">${esc(W.notes)}</textarea></div>
       <button class="btn huge good" data-act="finish">Finish & save</button>` : ""}</div>`;
   }
   $("w-body").innerHTML = h;
   ["w-parent", "w-notes"].forEach(id => { const t = $(id); if (t) t.addEventListener("input", () => { W[id === "w-parent" ? "parent" : "notes"] = t.value; saveW(); }); });
+  const wd = $("w-date"); if (wd) wd.addEventListener("change", () => { W.date = wd.value; saveW(); });
   ["weight", "reps", "result"].forEach(k => { const i = $("w-" + k); if (i) { i.addEventListener("focus", () => i.select()); i.addEventListener("input", () => (W.cur[k] = k === "result" ? i.value : +i.value || 0)); } });
+}
+// Which day the workout counts for: today, or up to a week back when you're typing in numbers after the fact.
+function dateField() {
+  const today = todayISO(), opts = [];
+  for (let i = 0; i < 8; i++) { const d = new Date(today + "T12:00:00"); d.setDate(d.getDate() - i); const iso = d.toISOString().slice(0, 10);
+    opts.push(`<option value="${iso}" ${iso === (W.date || today) ? "selected" : ""}>${i === 0 ? "Today" : i === 1 ? "Yesterday" : d.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</option>`); }
+  return `<div class="field"><label>Workout day</label><select id="w-date">${opts.join("")}</select></div>`;
 }
 function fmtSet(x, ex, holdIt) {
   if (ex.measure === "sec") return x.result ? x.result + "s" : "✓";
@@ -156,7 +164,8 @@ ACTIONS.finish = () => {
   const all = Object.keys(W.logged).flatMap(i => W.logged[i]);
   if (!all.length && !confirm("No sets logged yet. Finish anyway?")) return;
   stopRest();
-  const p = profile(), date = todayISO(), sid = uid("s_");
+  const p = profile(), date = W.date && W.date <= todayISO() ? W.date : todayISO(), sid = uid("s_");
+  const prevLast = progressOf(p.id).last_date || "";
   const sets = all.map(s => Object.assign({ id: uid("x_"), session_id: sid, profile_id: p.id, date, is_pr: false }, s));
   const mine = sessionsOf(p.id);
   const res = scoreWorkout({ profile: p, progress: progressOf(p.id), date, day_id: W.day_id, sets, history: setsOf(p.id), metricsHistory: metricsOf(p.id),
@@ -168,6 +177,7 @@ ACTIONS.finish = () => {
   put("Sets", sets);
   put("Metrics", res.metrics.map(m => Object.assign({ id: uid("m_"), profile_id: p.id, date }, m)));
   put("Sessions", session);
+  if (prevLast > date) res.progress.last_date = prevLast; // a back-dated workout doesn't rewind the streak clock
   put("Progress", Object.assign(res.progress, { id: p.id }));
   store.del(W.key);
   const finished = W; W = null;

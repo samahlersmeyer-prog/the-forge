@@ -59,12 +59,12 @@ function renderHome() {
   // family
   const others = profiles().filter(o => o.id !== p.id);
   if (others.length) {
-    h += `<div class="card"><h3>Family</h3>` + others.map(o => {
+    h += `<div class="card"><h3>Family${coaching() ? "" : ` <span class="muted small" style="font-weight:500">· tap to see their schedule and log for them</span>`}</h3>` + others.map(o => {
       const op = progressOf(o.id), last = sessionsOf(o.id)[0];
-      return `<div class="fam"><span class="av">${esc(o.avatar)}</span><div class="grow">
+      return `<button class="fam" data-act="as-on" data-id="${o.id}"><span class="av">${esc(o.avatar)}</span><div class="grow">
         <div class="row"><b>${esc(o.name)}</b><span class="pill">Lv ${op.level}</span><span class="small">🔥 ${op.streak}</span></div>
         <small>${last ? `${last.date === today ? "Today" : esc(last.date)}: ${esc(last.day_name)} (+${last.xp} XP)${(last.prs || []).length ? " · 🏆 " + last.prs.length + " PR" : ""}` : "No workouts yet"}</small>
-        ${op.badges.length ? `<div>${op.badges.slice(-8).map(b => (BADGE[b] || {}).emoji || "").join(" ")}</div>` : ""}</div></div>`;
+        ${op.badges.length ? `<div>${op.badges.slice(-8).map(b => (BADGE[b] || {}).emoji || "").join(" ")}</div>` : ""}</div><span class="fam-go">Schedule &amp; log ›</span></button>`;
     }).join("") + `</div>`;
   }
 
@@ -94,7 +94,9 @@ function pickLifter() {
   openModal(`<h2>Who's training?</h2>${profiles().map(o => `<button class="who-btn${isTeen(o) ? " teen" : ""}" data-act="be" data-id="${o.id}"><span class="av">${esc(o.avatar)}</span><span>${esc(o.name)}<small>${isTeen(o) ? "Athlete" : "Adult"} · Level ${progressOf(o.id).level}</small></span></button>`).join("")}
     <button class="btn ghost" data-act="new-profile">+ Add a lifter</button>`);
 }
-ACTIONS.be = el => { ME = el.dataset.id; store.set("af:me", ME); closeModal(); show("home"); };
+ACTIONS.be = el => { ME = el.dataset.id; store.set("af:me", ME); coachAs(null); closeModal(); show("home"); };
+ACTIONS["as-on"] = el => { coachAs(el.dataset.id); show("home"); $("home-body").scrollTop = 0; toast(`Coaching ${profile().name}`); };
+ACTIONS["as-off"] = () => { coachAs(null); show("home"); };
 ACTIONS["new-profile"] = () => { closeModal(); show("profile", { fresh: true }); };
 
 // ---------------- PLAN ----------------
@@ -176,7 +178,7 @@ function renderProfile(arg = {}) {
         goal: t === "teen" ? "sports" : "balanced", form_focus_mode: t === "teen", avatar: t === "teen" ? "⚡" : "🏋️" };
     }
   }
-  $("profile-title").textContent = FORM.fresh ? "New lifter" : "My specs";
+  $("profile-title").textContent = FORM.fresh ? "New lifter" : coaching() ? FORM.name + "'s specs" : "My specs";
   const f = FORM, teen = f.type === "teen";
   const seg = (key, opts) => `<div class="seg" style="grid-template-columns:repeat(${opts.length},1fr)">${opts.map(([v, l]) => `<button data-act="seg" data-k="${key}" data-v="${v}" class="${String(f[key]) === String(v) ? "on" : ""}">${l}</button>`).join("")}</div>`;
   const prog = progressOf(f.id);
@@ -231,7 +233,8 @@ ACTIONS["save-profile"] = el => {
   put("Profiles", p);
   const wasFresh = FORM.fresh;
   if (!el.dataset.keep || wasFresh) savePlan(p);
-  ME = p.id; store.set("af:me", ME); FORM = null;
+  if (wasFresh || !coaching()) { ME = p.id; store.set("af:me", ME); coachAs(null); }
+  FORM = null;
   toast(wasFresh ? "Plan built 💪" : "Saved");
   show(el.dataset.keep ? "home" : "plan");
 };

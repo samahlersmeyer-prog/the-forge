@@ -28,8 +28,10 @@ Pushing to `main` deploys. Built like Big Dawg Daily (`samahlersmeyer-prog/bigda
 - `js/howto.js` — `HOW[id]`: plain-English what/setup/steps + YouTube demo search for every exercise; `howBlock()` shows it on Plan and in the runner (open the first time a lifter does it). Every new exercise needs a HOW entry — the engine check fails without one.
 - `js/engine.js` — pure logic: `generatePlan`, `nextDay`, `suggest` (double progression), `scoreWorkout` (PRs, XP, streak + monthly freeze, badges).
 - `js/core.js` — local DB mirror of the Sheet, outbox (`af:out`) + `sync()`/`flush()`, `api()`, toast/modal/confetti/chime, `show(view)`, `ACTIONS` click delegation (`data-act`).
-- `js/views.js` — Home, Plan, Progress (sparklines), Profile/specs form, lifter switcher.
+- `js/views.js` — Home, Plan, Progress (sparklines), Profile/specs form, lifter switcher. Tapping someone in Home's Family card
+  = coaching them (`AS`/`coachAs()` in core.js): `profile()` follows them, a banner shows "Coaching Max · Back to Sam", lasts 6 h.
 - `js/workout.js` — in-gym runner; state saved per workout in `af:w:*`; finish → Sets/Metrics/Sessions/Progress rows.
+  "Workout day" picker on finish (today or up to 7 days back) for typing in numbers after the fact.
 - `js/coach.js` — Coach. `coachOn()` = Sheet says an API key is set → in-app answers, `vetChanges()` checks every
   workout change in code (teen: never heavier, never more sets, never a second core lift). Otherwise free mode:
   `openInClaude()` opens claude.ai/new?q= with rules + context.

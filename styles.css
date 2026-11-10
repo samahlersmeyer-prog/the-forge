@@ -197,7 +197,12 @@ textarea { width: 100%; min-height: 70px; border-radius: 12px; border: 1.5px sol
 .sess .pn { color: var(--teen); font-size: 13px; }
 
 /* family */
-.fam { display: flex; gap: 12px; align-items: center; padding: 6px 0; } .fam .av { font-size: 30px; }
+.fam { display: flex; gap: 12px; align-items: center; padding: 8px 0; width: 100%; text-align: left; border-top: 1px solid var(--line); } .fam .av { font-size: 30px; }
+.fam:first-of-type { border-top: 0; } .fam:active { background: var(--raise); }
+.fam-go { flex: none; font-size: 12px; font-weight: 700; color: var(--forge); } .teen-on .fam-go { color: var(--teen); }
+.as-bar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 12px 6px 16px; background: var(--forge-soft); font-size: 14px; }
+.as-bar.teen { background: var(--teen-soft); }
+.field select { width: 100%; height: 46px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--bg); padding: 0 10px; font-size: 16px; }
 .fam small { color: var(--muted); }
 
 /* forms */

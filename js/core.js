@@ -105,8 +105,13 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) sync
 
 // ---------- data helpers ----------
 let ME = store.get("af:me", null); // current profile id on this phone
+// AS = someone else's profile you're coaching from this phone (Dad viewing Max's schedule and logging his numbers).
+// Everything that calls profile() follows it; "Back to me" clears it. Lasts 6 hours so a reload mid-workout keeps it.
+let AS = (s => (s && s.id && Date.now() - s.t < 6 * 3600e3 ? s.id : null))(store.get("af:as", null));
 const profiles = () => rows("Profiles").sort((a, b) => (a.type === b.type ? a.name.localeCompare(b.name) : a.type === "adult" ? -1 : 1));
-const profile = id => DB.Profiles[id || ME] || null;
+const profile = id => DB.Profiles[id || (AS && AS !== ME && DB.Profiles[AS] ? AS : ME)] || null;
+const coaching = () => !!(AS && AS !== ME && DB.Profiles[AS] && DB.Profiles[ME]);
+function coachAs(id) { AS = id && id !== ME ? id : null; store.set("af:as", AS ? { id: AS, t: Date.now() } : null); }
 const activePlan = pid => rows("Plans").filter(p => p.profile_id === pid && p.active).sort((a, b) => (b.created || 0) - (a.created || 0))[0] || null;
 const sessionsOf = pid => rows("Sessions").filter(s => s.profile_id === pid).sort((a, b) => (b.date + b.updated).localeCompare(a.date + a.updated));
 const setsOf = pid => rows("Sets").filter(s => s.profile_id === pid);
@@ -170,8 +175,16 @@ function show(name, arg) {
   $("tabs").hidden = !TAB_VIEWS.includes(name);
   document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
   document.body.classList.toggle("teen-on", isTeen(profile()));
+  asBar(name);
   const r = { home: renderHome, plan: renderPlan, coach: renderCoach, progress: renderProgress, profile: renderProfile, workout: renderWorkout }[name];
   if (r) r(arg);
+}
+// Banner under the top bar while you're coaching someone else.
+function asBar(name) {
+  document.querySelectorAll(".as-bar").forEach(b => b.remove());
+  if (!coaching() || name === "who") return;
+  const p = profile(), me = DB.Profiles[ME], hdr = document.querySelector(`#v-${name} > header`);
+  if (hdr) hdr.insertAdjacentHTML("afterend", `<div class="as-bar${isTeen(p) ? " teen" : ""}"><span>${esc(p.avatar)} Coaching <b>${esc(p.name)}</b></span>${name === "workout" ? "" : `<button class="btn sm ghost" data-act="as-off">Back to ${esc(me.name)}</button>`}</div>`);
 }
 function refresh() { if (active !== "workout" && active !== "who") show(active); }
 document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => show(b.dataset.tab)));
