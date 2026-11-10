@@ -28,6 +28,9 @@ function AF_() {
   AF_MOD = new Function(src + '\n;return { doGet: doGet, doPost: doPost, setup: setup };')();
   return AF_MOD;
 }
+// Never called. Google only asks for the permissions it can see in this file, and the server code is loaded
+// from GitHub at run time, so this line is what makes it ask for access to this spreadsheet.
+function permissions_() { SpreadsheetApp.getActiveSpreadsheet(); }
 function doGet(e) { return AF_().doGet(e); }
 function doPost(e) { return AF_().doPost(e); }
 // Run this once from the editor: loads the code, creates the tabs and the Config rows.
