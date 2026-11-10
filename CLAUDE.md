@@ -35,7 +35,8 @@ Pushing to `main` deploys. Built like Big Dawg Daily (`samahlersmeyer-prog/bigda
 - `js/coach.js` — Coach. `coachOn()` = Sheet says an API key is set → in-app answers, `vetChanges()` checks every
   workout change in code (teen: never heavier, never more sets, never a second core lift). Otherwise free mode:
   `openInClaude()` opens claude.ai/new?q= with rules + context.
-- `js/boot.js` — PIN once per phone, who's training, first sync, service worker.
+- `js/boot.js` — PIN once per phone, who's training, first sync, service worker. Never a blank screen: render errors show a card
+  (`showCrash`) with Reload / "Reset this phone" (clears `af:*`, caches, service worker); sign-in has a "Stuck?" link + 8 s watchdog.
 - `server/Code.gs` — Apps Script backend (tabs auto-created, PIN check, `sync`/`save`, `coach`/`recap` via the Anthropic API;
   key in Script Properties `ANTHROPIC_API_KEY`; model in Config tab "Coach model"). `server/Loader.gs` is pasted once and
   pulls `Code.gs` from GitHub, so server changes go live in ~10 min with no deploy.

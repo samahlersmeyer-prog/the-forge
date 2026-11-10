@@ -23,6 +23,26 @@ function tryPin() {
     .catch(e => { if (/pin/.test(e.message)) store.del("af:pin"); $("pin-err").textContent = errText(e); $("pin-err").hidden = false; $("who-status").textContent = ""; });
 }
 
+ACTIONS.reload = () => location.reload();
+// Clears this phone's copy (the Sheet keeps everything) and the app cache, then starts fresh at the PIN screen.
+ACTIONS["reset-phone"] = () => {
+  if (store.get("af:out", []).length && !confirm("Some workouts on this phone haven't synced yet and would be lost. Reset anyway?")) return;
+  Object.keys(localStorage).filter(k => k.startsWith("af:")).forEach(k => localStorage.removeItem(k));
+  const done = () => location.reload();
+  Promise.all([
+    navigator.serviceWorker ? navigator.serviceWorker.getRegistrations().then(rs => Promise.all(rs.map(r => r.unregister()))) : 0,
+    window.caches ? caches.keys().then(ks => Promise.all(ks.map(k => caches.delete(k)))) : 0,
+  ]).then(done, done);
+};
+
+// Never leave the sign-in screen blank: errors show on screen with Reload / Reset buttons.
+window.addEventListener("error", e => { if (active === "who") showCrash(e.error || e.message); });
+window.addEventListener("unhandledrejection", e => { if (active === "who" && $("who-pin").hidden && $("who-pick").hidden) showCrash(e.reason); });
+setTimeout(() => {
+  if (active === "who" && !$("v-who").hidden && $("who-pin").hidden && $("who-pick").hidden && !$("who-status").textContent.trim())
+    whoScreen(SERVER && !pin() ? "pin" : "pick", "Took too long to load — pick up here.");
+}, 8000);
+
 function boot() {
   syncDot();
   if (SERVER && !pin()) return whoScreen("pin");

@@ -16,7 +16,7 @@ const cuesList = ex => (ex.form_cues || "").split("|").map(c => `<li>${esc(c.tri
 // ---------------- HOME ----------------
 function renderHome() {
   const p = profile();
-  if (!p) return show("who");
+  if (!p) return enter();
   const teen = isTeen(p), today = todayISO();
   $("me-chip").className = "me-chip" + (teen ? " teen" : "");
   $("me-chip").innerHTML = `<span class="av">${esc(p.avatar)}</span>${esc(p.name)} ▾`;

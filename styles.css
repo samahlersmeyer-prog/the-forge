@@ -246,3 +246,4 @@ details.how ol { padding-left: 18px; }
 .how-box .how-demo { margin-left: 0; font-size: 14px; }
 .teen-on .how-demo { color: var(--teen); }
 .how-box ol li::before { content: none; }
+.link-btn { color: var(--muted); font-size: 12px; text-decoration: underline; margin-top: 24px; align-self: center; }

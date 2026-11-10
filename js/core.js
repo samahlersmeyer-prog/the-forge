@@ -175,9 +175,18 @@ function show(name, arg) {
   $("tabs").hidden = !TAB_VIEWS.includes(name);
   document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
   document.body.classList.toggle("teen-on", isTeen(profile()));
-  asBar(name);
+  try { asBar(name); } catch (e) { console.error(e); }
   const r = { home: renderHome, plan: renderPlan, coach: renderCoach, progress: renderProgress, profile: renderProfile, workout: renderWorkout }[name];
-  if (r) r(arg);
+  if (r) try { r(arg); } catch (e) { showCrash(e); }
+}
+// If a screen ever fails to draw, say so and offer a way out instead of leaving a blank page.
+function showCrash(e) {
+  console.error(e);
+  const msg = esc((e && (e.message || e)) || "Unknown error");
+  const box = document.querySelector(`#v-${active} .body`) || $("who-status");
+  const html = `<div class="card"><h2>Something went wrong</h2><p class="muted small">${msg}</p>
+    <div class="pills"><button class="btn sm" data-act="reload">Reload</button><button class="btn sm ghost" data-act="reset-phone">Reset this phone</button></div></div>`;
+  if (box && box.id !== "who-status") box.innerHTML = html; else { show("who"); $("who-pin").hidden = $("who-pick").hidden = true; $("who-status").innerHTML = html; }
 }
 // Banner under the top bar while you're coaching someone else.
 function asBar(name) {
