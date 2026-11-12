@@ -23,17 +23,27 @@ Pushing to `main` deploys. Built like Big Dawg Daily (`samahlersmeyer-prog/bigda
   16-lifting-set soft cap, never two lower-body lifting days in a row, parent notes on teen sessions.
 
 ## Layout
-- Tagline: “As iron sharpens iron, so one person sharpens another.” (Proverbs 27:17) — `TAGLINE` in views.js; shown on sign-in, top of Home, workout summary.
+- Tagline: “As iron sharpens iron, so one person sharpens another.” (Proverbs 27:17) — `TAGLINE` in views.js; shown on sign-in and the workout summary (not Home).
 - `index.html` markup only. `styles.css` all styles (light/dark by system; adult = forge orange, teen = blue via `body.teen-on`).
 - `config.js` — Apps Script `/exec` URL (blank = phone-only mode).
 - `js/data.js` — exercise library `EXERCISES` / `EX` (form cues split by " | ").
 - `js/howto.js` — `HOW[id]`: plain-English what/setup/steps + YouTube demo search for every exercise; `howBlock()` shows it on Plan and in the runner (open the first time a lifter does it). Every new exercise needs a HOW entry — the engine check fails without one.
 - `js/engine.js` — pure logic: `generatePlan`, `nextDay`, `suggest` (double progression), `scoreWorkout` (PRs, XP, streak + monthly freeze, badges).
 - `js/core.js` — local DB mirror of the Sheet, outbox (`af:out`) + `sync()`/`flush()`, `api()`, toast/modal/confetti/chime, `show(view)`, `ACTIONS` click delegation (`data-act`).
-- `js/views.js` — Home, Plan, Progress (sparklines), Profile/specs form (new lifter = 3 steps; first run does Sam, then
+- Tabs: Home · Plan · History · Progress · Me. Coach is a screen opened from Home's Coach card and the workout ⋯ menu.
+- `js/views.js` — Home (level, today, week strip, monthly challenges, ⚔️ head-to-head, coach, family), Plan (days collapsed,
+  next one open), Progress (`lineChart`/`barChart` SVG: e1RM trend — teen shows top set weight, no max language — drills,
+  weekly work), History (month calendar + list; tap a workout to see/fix numbers and notes — XP/badges don't re-score),
+  Monthly challenges (`challengesFor`: built from the lifter's own numbers before the month; teen = 💯 Max Effort and needs a
+  parent's 👍 via `ch-ok`; +100 XP each, all three = 🏅 badge; approvals live in Progress.`approved`), Profile/specs form (new lifter = 3 steps; first run does Sam, then
   "Now add Max", and Max's plan opens in coaching mode), lifter switcher. Tapping someone in Home's Family card
   = coaching them (`AS`/`coachAs()` in core.js): `profile()` follows them, a banner shows "Coaching Max · Back to Sam", lasts 6 h.
 - `js/workout.js` — in-gym runner; state saved per workout in `af:w:*`; finish → Sets/Metrics/Sessions/Progress rows.
+  Start → 3-tap check-in (sleep/soreness/energy, score 0–6; ≤2 offers a lighter day: −10% main lift, −1 set accessories/sprints,
+  saved as Sessions.`readiness`). Hold timer (3-2-1 then countdown, auto-logs; also warm-up/cool-down). Warm-up sets with
+  plates on core lifts (`rampSets`, `platesFor`, 45 bar). Supersets: back-to-back accessories pair as A1/A2 (`pairsOf`), toggled
+  in ⋯. ⋯ menu: add / swap / remove / supersets / Ask Coach. `canUse()` enforces one core lift per session and teen-safe lists
+  (beginner teens stay on technique versions). Rest timer beeps at 3-2-1 and flashes GO.
   "Workout day" picker on finish (today or up to 7 days back) for typing in numbers after the fact.
 - `js/coach.js` — Coach. `coachOn()` = Sheet says an API key is set → in-app answers, `vetChanges()` checks every
   workout change in code (teen: never heavier, never more sets, never a second core lift). Otherwise free mode:
@@ -48,4 +58,4 @@ Pushing to `main` deploys. Built like Big Dawg Daily (`samahlersmeyer-prog/bigda
 ## To-do
 - Sheet connected (Nov 2026): "The Forge — Data" in Sam's Drive, Apps Script project "The Forge Server", web app deployed
   (Execute as Me, Anyone), URL in `config.js`. PIN lives in the Config tab. Coach is in free mode until an API key is added (README step 5).
-- Ideas: more for Max (Max Effort challenges), coach-written weekly plan tweaks, charts on the Progress tab.
+- Ideas: coach-written weekly plan tweaks; let Sam set which plates he owns (PLATES in workout.js).

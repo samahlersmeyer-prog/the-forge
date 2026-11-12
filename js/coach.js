@@ -67,7 +67,7 @@ function renderCoach() {
     ? ["How do I get faster off the line?", "My legs are sore, what should I do?", "What should I focus on in my squat?", "How do I jump higher?"]
     : ["What should I focus on this week?", "My lower back is tight — adjust today?", "How's my progress looking?", "Best warm-up for heavy squats?"];
   let h = coachOn()
-    ? `<div class="msg coach">Hey ${esc(p.name)} — I know your plan, your recent sessions and your numbers. Ask me about form, soreness, speed, or what's next.${isTeen(p) ? "" : " During a workout, tap 🧢 Coach to change today's session."}</div>`
+    ? `<div class="msg coach">Hey ${esc(p.name)} — I know your plan, your recent sessions and your numbers. Ask me about form, soreness, speed, or what's next.${isTeen(p) ? "" : " During a workout, tap ⋯ → Ask Coach to change today's session."}</div>`
     : `<div class="msg coach">${FREE_NOTE(p)} Ask about form, soreness, speed, or what's next.</div>`;
   log.forEach(c => { h += `<div class="msg me">${esc(c.q)}</div><div class="msg coach">${esc(c.a)}</div>`; });
   h += `<div class="quick" id="coach-quick">${quick.map(q => `<button data-act="ask-quick">${esc(q)}</button>`).join("")}</div>`;
@@ -170,7 +170,7 @@ ACTIONS["adj-apply"] = () => {
     }
     if (c.action === "remove") removes.push(c.i);
   });
-  removes.sort((a, b) => b - a).forEach(i => { W.items.splice(i, 1); const L = {}, D = {}; Object.keys(W.logged).forEach(k => { const n = +k; if (n !== i) L[n > i ? n - 1 : n] = W.logged[k]; }); Object.keys(W.done).forEach(k => { const n = +k; if (n !== i) D[n > i ? n - 1 : n] = W.done[k]; }); W.logged = L; W.done = D; });
+  removes.sort((a, b) => b - a).forEach(i => removeItem(i));
   W.idx = Math.min(W.idx, W.items.length - 1);
   W.coach.push({ q: pend.q, reply: pend.reply, changes: pend.changes.map(describeChange) });
   W.cur = null; window.__pending = null; saveW(); closeModal(); renderWorkout(); toast("Coach's changes applied 🧢");

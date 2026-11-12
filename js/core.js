@@ -20,7 +20,7 @@ const store = {
 
 // ---------- local database (mirror of the Sheet) ----------
 const TABS = ["Profiles", "Plans", "Sessions", "Sets", "Metrics", "Progress", "Recaps", "Coach"];
-const JSON_FIELDS = ["lifts", "days", "schedule", "rules", "prs", "badges", "best", "coach_changes"];
+const JSON_FIELDS = ["lifts", "days", "schedule", "rules", "prs", "badges", "best", "coach_changes", "approved", "readiness"];
 const NUM_FIELDS = ["age", "bodyweight", "days_per_week", "session_length", "duration_min", "xp", "set_number", "weight", "reps", "rpe", "form", "result", "value", "level", "streak", "longest", "updated", "created", "ts"];
 const BOOL_FIELDS = ["form_focus_mode", "active", "is_pr"];
 let DB = store.get("af:db", null) || Object.fromEntries(TABS.map(t => [t, {}]));
@@ -116,7 +116,7 @@ const activePlan = pid => rows("Plans").filter(p => p.profile_id === pid && p.ac
 const sessionsOf = pid => rows("Sessions").filter(s => s.profile_id === pid).sort((a, b) => (b.date + b.updated).localeCompare(a.date + a.updated));
 const setsOf = pid => rows("Sets").filter(s => s.profile_id === pid);
 const metricsOf = pid => rows("Metrics").filter(m => m.profile_id === pid).sort((a, b) => a.date.localeCompare(b.date));
-const progressOf = pid => Object.assign({ id: pid, xp: 0, level: 1, streak: 0, longest: 0, last_date: "", freeze_month: "", badges: [], best: {} }, DB.Progress[pid] || {});
+const progressOf = pid => Object.assign({ id: pid, xp: 0, level: 1, streak: 0, longest: 0, last_date: "", freeze_month: "", badges: [], best: {}, approved: [] }, DB.Progress[pid] || {});
 const isTeen = p => p && p.type === "teen";
 function mondayOf(d) { const x = new Date(d + "T12:00:00"); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x.toISOString().slice(0, 10); }
 
@@ -154,20 +154,26 @@ let actx = null;
 function chime(kind = "win") {
   try {
     actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-    const notes = { win: [523, 659, 784, 1047], go: [880, 1175], tick: [660] }[kind] || [660];
+    const notes = { win: [523, 659, 784, 1047], go: [880, 1175, 880, 1175, 1568], tick: [660], beep: [880] }[kind] || [660];
     notes.forEach((f, i) => {
       const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + i * 0.11;
       o.type = "triangle"; o.frequency.value = f; o.connect(g).connect(actx.destination);
-      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.25, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(kind === "go" ? 0.6 : 0.25, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
       o.start(t); o.stop(t + 0.4);
     });
   } catch (e) {}
 }
+// Big full-screen flash when a timer ends, so you see it the moment you look at the phone.
+function goFlash(text = "GO") {
+  const f = $("go-flash"); $("go-flash-t").textContent = text; f.hidden = false;
+  f.classList.remove("on"); void f.offsetWidth; f.classList.add("on");
+  clearTimeout(goFlash.t); goFlash.t = setTimeout(() => (f.hidden = true), 1600);
+}
 const buzz = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
 
 // ---------- navigation ----------
-const VIEWS = ["who", "home", "plan", "coach", "progress", "profile", "workout"];
-const TAB_VIEWS = ["home", "plan", "coach", "progress", "profile"];
+const VIEWS = ["who", "home", "plan", "coach", "history", "progress", "profile", "workout"];
+const TAB_VIEWS = ["home", "plan", "coach", "history", "progress", "profile"];
 let active = "who";
 function show(name, arg) {
   active = name;
@@ -176,7 +182,7 @@ function show(name, arg) {
   document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
   document.body.classList.toggle("teen-on", isTeen(profile()));
   try { asBar(name); } catch (e) { console.error(e); }
-  const r = { home: renderHome, plan: renderPlan, coach: renderCoach, progress: renderProgress, profile: renderProfile, workout: renderWorkout }[name];
+  const r = { home: renderHome, plan: renderPlan, coach: renderCoach, history: renderHistory, progress: renderProgress, profile: renderProfile, workout: renderWorkout }[name];
   if (r) try { r(arg); } catch (e) { showCrash(e); }
 }
 // If a screen ever fails to draw, say so and offer a way out instead of leaving a blank page.

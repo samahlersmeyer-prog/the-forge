@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&family=Zilla+Slab:wght@600;700&display=swap" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="styles.css?v=2f918212f7">
+<link rel="stylesheet" href="styles.css?v=517694d06f">
 </head>
 <body>
 <div id="app">
@@ -61,12 +61,18 @@
 
   <!-- COACH -->
   <section class="view tabbed" id="v-coach" hidden>
-    <header class="bar"><span></span><h1>Coach</h1><span></span></header>
+    <header class="bar"><button class="icon" data-act="back-home" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h1>Coach</h1><span></span></header>
     <div class="body chat" id="coach-body"></div>
     <form class="ask" id="coach-form">
       <input id="coach-in" placeholder="Ask Coach anything…" autocomplete="off">
       <button class="btn" id="coach-send">Ask</button>
     </form>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="view tabbed" id="v-history" hidden>
+    <header class="bar"><span></span><h1>History</h1><span></span></header>
+    <div class="body" id="history-body"></div>
   </section>
 
   <!-- PROGRESS -->
@@ -86,7 +92,7 @@
     <header class="bar wbar">
       <button class="icon" data-act="leave-workout" aria-label="Leave"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       <div class="wtitle"><b id="w-title"></b><small id="w-sub"></small></div>
-      <div class="bar-r"><button class="btn sm coachbtn" data-act="coach-adjust">🧢 Coach</button><button class="btn sm" id="w-finish" data-act="finish">Finish</button></div>
+      <div class="bar-r"><button class="icon" id="w-menu" data-act="w-menu" aria-label="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button><button class="btn sm" id="w-finish" data-act="finish">Finish</button></div>
     </header>
     <div class="chips" id="w-chips"></div>
     <div class="body" id="w-body"></div>
@@ -100,23 +106,24 @@
   <nav class="tabs" id="tabs" hidden>
     <button data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
     <button data-tab="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>Plan</button>
-    <button data-tab="coach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg>Coach</button>
+    <button data-tab="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>History</button>
     <button data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Progress</button>
     <button data-tab="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Me</button>
   </nav>
 
   <div class="modal" id="modal" hidden><div class="sheet"><button class="icon close" id="modal-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div id="modal-body"></div></div></div>
   <div class="toast" id="toast" hidden></div>
+  <div class="go-flash" id="go-flash" hidden><b id="go-flash-t">GO</b></div>
 </div>
 
 <script src="config.js?v=041f9e4200"></script>
 <script src="js/data.js?v=a86059aecc"></script>
 <script src="js/howto.js?v=7ef689141b"></script>
-<script src="js/engine.js?v=f38496c7d9"></script>
-<script src="js/core.js?v=ad53452815"></script>
-<script src="js/views.js?v=2e414b4568"></script>
-<script src="js/workout.js?v=3b60101580"></script>
-<script src="js/coach.js?v=8d247c2c86"></script>
+<script src="js/engine.js?v=d69b73792a"></script>
+<script src="js/core.js?v=07436401f3"></script>
+<script src="js/views.js?v=1d5a8c1673"></script>
+<script src="js/workout.js?v=1bcd4f4ba4"></script>
+<script src="js/coach.js?v=72e6c20a24"></script>
 <script src="js/boot.js?v=d4e165b7fc"></script>
 </body>
 </html>

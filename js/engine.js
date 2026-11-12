@@ -403,6 +403,7 @@ const BADGES = [
   { id: "speed_pr", name: "Wheels", emoji: "💨", desc: "Beat a sprint or agility time" },
   { id: "jump_pr", name: "Hops", emoji: "🦘", desc: "Beat a jump distance" },
   { id: "family_day", name: "Family Grind", emoji: "🤝", desc: "You both trained on the same day" },
+  { id: "challenge_month", name: "Month Conquered", emoji: "🏅", desc: "Finished all three monthly challenges" },
 ];
 const BADGE = Object.fromEntries(BADGES.map(b => [b.id, b]));
 
